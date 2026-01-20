@@ -780,9 +780,9 @@ const FinaleScene = ({
               transform: 'translate(-50%, -120%)'
             }}
           >
-            <div className="bg-black/90 border border-stone-500 text-white px-4 py-2 md:px-6 md:py-3 rounded-full text-xl md:text-3xl font-coy whitespace-nowrap drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+            <div className="bg-stone-900/95 border border-amber-500/50 text-amber-50 px-4 py-3 rounded-xl text-lg md:text-xl font-vintage shadow-2xl backdrop-blur-md w-max max-w-[200px] md:max-w-[280px] text-center leading-snug">
               {FISH_DATA.find(f => f.id === hoveredFish)!.content.title}
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-black/90 border-r border-b border-stone-500 rotate-45" />
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-stone-900/95 border-r border-b border-amber-500/50 rotate-45" />
             </div>
           </div>
         )}
