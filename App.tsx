@@ -508,13 +508,13 @@ const FishDetailView = ({ data, imageSrc }: { data: FishData, imageSrc: string }
     let text = data.content.body;
     data.content.highlightTerms.forEach(term => {
       const regex = new RegExp(`(${term})`, 'gi');
-      text = text.replace(regex, '<span class="text-amber-400 bg-stone-800 px-1 border-b border-amber-500/50">$1</span>');
+      text = text.replace(regex, '<span class="text-amber-700 bg-amber-50 px-1 border-b border-amber-500/30 font-semibold">$1</span>');
     });
-    return <p className="font-serif text-lg md:text-xl leading-relaxed text-stone-300" dangerouslySetInnerHTML={{ __html: text }} />;
+    return <p className="font-serif text-lg md:text-xl leading-relaxed text-stone-800" dangerouslySetInnerHTML={{ __html: text }} />;
   };
 
   return (
-    <div className="w-full bg-stone-900 border-t-8 border-amber-600/30 text-stone-200 animate-in fade-in slide-in-from-bottom-10 duration-500 pb-20 mt-12">
+    <div className="w-full bg-[#FAF9F6] border-t-8 border-stone-300 text-stone-900 animate-in fade-in slide-in-from-bottom-10 duration-500 pb-20 mt-12 shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
 
       {/* Header Content */}
       <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
@@ -522,24 +522,25 @@ const FishDetailView = ({ data, imageSrc }: { data: FishData, imageSrc: string }
         <FishCutout src={imageSrc} data={data} />
 
         <div className="flex flex-col text-center md:text-left">
-          <div className="font-mono text-xs text-amber-500 tracking-widest mb-2 uppercase">Research Topic: {data.id}</div>
-          <h1 className="text-3xl md:text-5xl font-coy text-white mb-6 leading-tight">{data.content.title}</h1>
-          <div className="bg-stone-800/50 p-6 md:p-8 rounded-lg border border-stone-700 shadow-inner">
+          <div className="font-mono text-xs text-amber-600 tracking-widest mb-2 uppercase font-bold">Research Topic: {data.id}</div>
+          <h1 className="text-3xl md:text-5xl font-coy text-stone-900 mb-6 leading-tight">{data.content.title}</h1>
+          <div className="bg-white p-6 md:p-8 rounded-lg border border-stone-200 shadow-sm relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/20 to-transparent" />
             {renderBody()}
           </div>
         </div>
       </div>
 
-      {/* Ticker */}
-      <div className="w-full h-16 bg-stone-950 text-amber-500/80 flex items-center overflow-hidden whitespace-nowrap border-y border-stone-800 relative">
-        <div className="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-stone-950 to-transparent z-10" />
-        <div className="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-stone-950 to-transparent z-10" />
+      {/* Ticker - Light Theme */}
+      <div className="w-full h-16 bg-white text-stone-400 flex items-center overflow-hidden whitespace-nowrap border-y border-stone-200 relative">
+        <div className="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-white to-transparent z-10" />
+        <div className="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-white to-transparent z-10" />
 
         <div className="animate-ticker inline-block pl-[100%]">
           {[...Array(10)].map((_, i) => (
             <span key={i} className="mx-8 font-mono font-bold text-lg tracking-wider flex items-center gap-4 inline-flex">
               {data.content.tickerItems.map((item, idx) => (
-                <span key={idx} className="opacity-70 hover:opacity-100 transition-opacity">{item} •</span>
+                <span key={idx} className="opacity-70 hover:opacity-100 hover:text-amber-600 transition-colors">{item} •</span>
               ))}
             </span>
           ))}
@@ -895,24 +896,7 @@ const HunterScene = ({
         })}
       </div>
 
-      {/* CALIBRATION PANEL (Hidden by default) */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <button
-          onClick={() => setShowDebug(!showDebug)}
-          className={`px-3 py-1 rounded text-xs font-bold uppercase transition shadow-lg ${showDebug ? 'bg-red-600 text-white' : 'bg-stone-700 hover:bg-stone-600 text-stone-300'}`}
-        >
-          {showDebug ? 'Debug ON' : 'Debug OFF'}
-        </button>
-      </div>
-
-      {showDebug && lockedHunterId && (
-        <div className="fixed top-4 right-4 w-64 bg-stone-900/95 border border-stone-700 rounded p-4 text-xs space-y-4 shadow-xl z-50 text-stone-200 backdrop-blur pointer-events-auto">
-          <div className="space-y-2">
-            <strong className="block text-green-400">Angle</strong>
-            <input type="range" min="-180" max="180" step="1" value={hunters.find(h => h.id === lockedHunterId)?.angle} onChange={(e) => updateHunter(lockedHunterId, 'angle', parseFloat(e.target.value))} className="w-full accent-green-500" />
-          </div>
-        </div>
-      )}
+      {/* Debug Panel Hidden */}
     </div>
   );
 };
@@ -926,6 +910,7 @@ export default function App() {
     landing: DEFAULT_FINALE_VIDEO_SRC
   });
   const [isNewsTransitioning, setIsNewsTransitioning] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [transitionStartPos, setTransitionStartPos] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
   // ROUTING LOGIC
@@ -990,32 +975,61 @@ export default function App() {
         {currentPage === 'CONTACT' && <InfoPage title="CONTACT US" content="Have questions? Reach out to our digital preservation team." />}
       </main>
 
-      {/* NAVIGATION MENU */}
+      {/* HAMBURGER NAVIGATION */}
       {currentPage !== 'SETUP' && !isNewsTransitioning && (
-        <div className="fixed bottom-4 left-4 z-[100] flex flex-col space-y-2">
-          <div className="bg-stone-950/90 border border-stone-700 p-2 rounded shadow-xl backdrop-blur-sm flex flex-col space-y-1">
-            <div className="text-[10px] text-stone-500 font-bold uppercase tracking-wider mb-1 px-2">Navigation</div>
-            {[
-              { id: 'SCENE', label: 'Hunter Scene' },
-              { id: 'LANDING', label: 'Finale Art' },
-              { id: 'NEWS', label: 'News' },
-              { id: 'ABOUT', label: 'About' },
-              { id: 'CONTACT', label: 'Contact' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setCurrentPage(item.id as PageType);
-                  // Reset transition state if navigating manually
-                  setIsNewsTransitioning(false);
-                }}
-                className={`text-left px-3 py-1 rounded text-xs font-bold uppercase transition ${currentPage === item.id ? 'bg-amber-600 text-black' : 'text-stone-400 hover:text-white hover:bg-stone-700'}`}
-              >
-                {item.label}
-              </button>
-            ))}
+        <>
+          {/* Hamburger Button */}
+          <button
+            className="fixed top-6 right-6 z-[100] p-3 bg-stone-900/80 rounded-full border border-stone-600 text-white hover:bg-amber-600 hover:border-amber-500 transition-all duration-300 shadow-xl group"
+            onClick={() => setIsNavOpen(true)}
+          >
+            <div className="space-y-1.5 w-6 flex flex-col items-center justify-center">
+              <span className="block w-6 h-0.5 bg-current transform transition group-hover:scale-x-110" />
+              <span className="block w-6 h-0.5 bg-current transform transition group-hover:scale-x-90" />
+              <span className="block w-6 h-0.5 bg-current transform transition group-hover:scale-x-110" />
+            </div>
+          </button>
+
+          {/* Side Menu Overlay */}
+          <div
+            className={`fixed inset-0 z-[101] bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => setIsNavOpen(false)}
+          />
+
+          {/* Side Menu Panel */}
+          <div
+            className={`fixed top-0 right-0 h-full w-80 bg-stone-950 border-l border-stone-800 shadow-2xl z-[102] transform transition-transform duration-300 ease-out p-8 flex flex-col ${isNavOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          >
+            <div className="flex justify-between items-center mb-12">
+              <h2 className="text-amber-500 font-mono text-xs tracking-[0.2em] uppercase">Navigation</h2>
+              <button onClick={() => setIsNavOpen(false)} className="text-stone-500 hover:text-white transition">✕</button>
+            </div>
+
+            <nav className="flex flex-col space-y-6">
+              {[
+                { id: 'SCENE', label: 'Immunofoundry Home' },
+                { id: 'LANDING', label: 'Our Research' },
+                { id: 'NEWS', label: 'News' }
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setCurrentPage(item.id as PageType);
+                    setIsNavOpen(false);
+                    setIsNewsTransitioning(false);
+                  }}
+                  className={`text-left text-2xl font-coy transition-all hover:translate-x-2 ${currentPage === item.id ? 'text-white border-l-4 border-amber-500 pl-4' : 'text-stone-500 hover:text-amber-200'}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="mt-auto pt-8 border-t border-stone-800 text-stone-600 text-xs font-mono leading-relaxed">
+              &copy; 2026 Immunofoundry.<br />Preserving the future of immunology.
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
